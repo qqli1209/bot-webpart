@@ -15,6 +15,7 @@ export default class BotFrameworkChat extends React.Component<IBotFrameworkChatP
   private currentMessageText;
   private sendAsUserName;
 
+  // 为 输入框绑定 keyDown 和 keyUp event
   public render(): JSX.Element {
     return (
       <div className={styles.botFrameworkChat}>
@@ -27,14 +28,21 @@ export default class BotFrameworkChat extends React.Component<IBotFrameworkChatP
             </div>
           </div>
           <div className={css('ms-Grid-row')}>
-            <TextField id='MessageBox' onKeyUp={(e) => this.tbKeyUp(e)} onKeyDown={(e) => this.tbKeyDown(e)}
-              value={this.currentMessageText} placeholder={this.props.placeholderText} className={css('ms-fontSize-m', styles.messageBox)} />
+            <TextField
+              id='MessageBox'
+              onKeyUp={(e) => this.tbKeyUp(e)}
+              onKeyDown={(e) => this.tbKeyDown(e)}
+              value={this.currentMessageText}
+              placeholder={this.props.placeholderText}
+              className={css('ms-fontSize-m', styles.messageBox)}
+            />
           </div>
         </div>
       </div>
     );
   }
 
+  // 调用 Graph API 把 converastion 最新的消息 pull下来
   public componentDidUpdate(prevProps: IBotFrameworkChatProps, prevState: {}, prevContext: any): void {
     if (this.props.directLineSecret !== prevProps.directLineSecret) {
       if (this.props.directLineSecret) {
@@ -70,15 +78,7 @@ export default class BotFrameworkChat extends React.Component<IBotFrameworkChatP
     }
   }
 
-  public getMessagesHtml() {
-    return this.messagesHtml;
-  }
-
-  public tbKeyUp(e) {
-    this.currentMessageText = e.target.value;
-    this.forceMessagesContainerScroll();
-  }
-
+  // 用户按下 Enter 键之后，调用 Graph API 把用户输入的消息发送出去
   public tbKeyDown(e) {
     if (e.keyCode === 13) {
       var messageToSend = this.currentMessageText;
@@ -107,6 +107,12 @@ export default class BotFrameworkChat extends React.Component<IBotFrameworkChatP
         }).catch((err) => console.error('Error sending message:', err));
     }
   }
+  
+  // 用户释放 Enter 键之后，把整个消息对话框往上拉，形成消息流
+  public tbKeyUp(e) {
+    this.currentMessageText = e.target.value;
+    this.forceMessagesContainerScroll();
+  }
 
   protected pollMessages(client, conversationId) {
     console.log('Starting polling message for conversationId: ' + conversationId);
@@ -128,6 +134,10 @@ export default class BotFrameworkChat extends React.Component<IBotFrameworkChatP
         messages.forEach(this.printMessage);
       }
     }
+  }
+
+  protected getMessagesHtml() {
+    return this.messagesHtml;
   }
 
   protected printMessage(message) {

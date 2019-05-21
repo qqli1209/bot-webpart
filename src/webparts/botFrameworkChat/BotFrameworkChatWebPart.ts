@@ -1,13 +1,11 @@
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
-import { Version } from '@microsoft/sp-core-library';
 import {
   BaseClientSideWebPart,
   IPropertyPaneConfiguration,
   PropertyPaneTextField
 } from '@microsoft/sp-webpart-base';
 
-import * as strings from 'BotFrameworkChatWebPartStrings';
 import BotFrameworkChat from './components/BotFrameworkChat';
 import { IBotFrameworkChatProps } from './components/IBotFrameworkChatProps';
 
@@ -48,10 +46,6 @@ export default class BotFrameworkChatWebPart extends BaseClientSideWebPart<IBotF
 
   protected onDispose(): void {
     ReactDom.unmountComponentAtNode(this.domElement);
-  }
-
-  protected get dataVersion(): Version {
-    return Version.parse('1.0');
   }
 
   protected getPropertyPaneConfiguration(): IPropertyPaneConfiguration {
