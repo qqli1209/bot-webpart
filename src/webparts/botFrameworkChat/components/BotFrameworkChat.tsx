@@ -43,42 +43,6 @@ export default class BotFrameworkChat extends React.Component<IBotFrameworkChatP
     );
   }
 
-  // 调用 Graph API 把 converastion 最新的消息 pull下来
-  public componentDidUpdate(prevProps: IBotFrameworkChatProps, prevState: {}, prevContext: any): void {
-    if (this.props.directLineSecret !== prevProps.directLineSecret) {
-      if (this.props.directLineSecret) {
-        var Swagger = require('swagger-client');
-        var directLineSpec = require('./directline-swagger.json');
-
-        this.directLineClientSwagger = new Swagger(
-          {
-            spec: directLineSpec,
-            usePromise: true,
-          }).then((client) => {
-            client.clientAuthorizations.add('AuthorizationBotConnector', new Swagger.ApiKeyAuthorization('Authorization', 'BotConnector ' + this.props.directLineSecret, 'header'));
-            console.log('DirectLine client generated');
-            return client;
-          }).catch((err) =>
-            console.error('Error initializing DirectLine client', err));
-
-        this.directLineClientSwagger.then((client) => {
-          client.Conversations.Conversations_NewConversation()
-            .then((response) => response.obj.conversationId)
-            .then((conversationId) => {
-
-              this.conversationId = conversationId;
-              this.pollMessages(client, conversationId);
-              this.directLineClient = client;
-            });
-        });
-
-        this.sendAsUserName = this.props.context.pageContext.user.loginName;
-
-        this.printMessage = this.printMessage.bind(this);
-      }
-    }
-  }
-
   // 用户按下 Enter 键之后，调用 Graph API 把用户输入的消息发送出去
   public tbKeyDown(e) {
     if (e.keyCode === 13) {
@@ -113,6 +77,42 @@ export default class BotFrameworkChat extends React.Component<IBotFrameworkChatP
   public tbKeyUp(e) {
     this.currentMessageText = e.target.value;
     this.forceMessagesContainerScroll();
+  }
+
+  // 调用 Graph API 把 converastion 最新的消息 pull下来
+  public componentDidUpdate(prevProps: IBotFrameworkChatProps, prevState: {}, prevContext: any): void {
+    if (this.props.directLineSecret !== prevProps.directLineSecret) {
+      if (this.props.directLineSecret) {
+        var Swagger = require('swagger-client');
+        var directLineSpec = require('./directline-swagger.json');
+
+        this.directLineClientSwagger = new Swagger(
+          {
+            spec: directLineSpec,
+            usePromise: true,
+          }).then((client) => {
+            client.clientAuthorizations.add('AuthorizationBotConnector', new Swagger.ApiKeyAuthorization('Authorization', 'BotConnector ' + this.props.directLineSecret, 'header'));
+            console.log('DirectLine client generated');
+            return client;
+          }).catch((err) =>
+            console.error('Error initializing DirectLine client', err));
+
+        this.directLineClientSwagger.then((client) => {
+          client.Conversations.Conversations_NewConversation()
+            .then((response) => response.obj.conversationId)
+            .then((conversationId) => {
+
+              this.conversationId = conversationId;
+              this.pollMessages(client, conversationId);
+              this.directLineClient = client;
+            });
+        });
+
+        this.sendAsUserName = this.props.context.pageContext.user.loginName;
+
+        this.printMessage = this.printMessage.bind(this);
+      }
+    }
   }
 
   protected pollMessages(client, conversationId) {
