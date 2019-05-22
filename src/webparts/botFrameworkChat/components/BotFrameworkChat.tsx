@@ -15,6 +15,7 @@ export default class BotFrameworkChat extends React.Component<IBotFrameworkChatP
   private currentMessageText;
   private sendAsUserName;
 
+  // webpart lifecycle 和 event listner 结合
   // 为 输入框绑定 keyDown 和 keyUp event
   public render(): JSX.Element {
     return (
